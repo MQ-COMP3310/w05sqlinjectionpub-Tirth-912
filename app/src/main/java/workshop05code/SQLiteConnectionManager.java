@@ -21,7 +21,7 @@ public class SQLiteConnectionManager {
     static {
         // must set before the Logger
         // loads logging.properties from the classpath
-        try {// resources\logging.properties
+        try {
             LogManager.getLogManager().readConfiguration(new FileInputStream("resources/logging.properties"));
         } catch (SecurityException | IOException e1) {
             e1.printStackTrace();
@@ -64,12 +64,12 @@ public class SQLiteConnectionManager {
         try (Connection conn = DriverManager.getConnection(databaseURL)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
+                logger.info("The driver name is " + meta.getDriverName());
+                logger.info("A new database has been created.");
 
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Failed to create new database.", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class SQLiteConnectionManager {
                     return true;
                 }
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, "Database connection check failed.", e);
                 return false;
             }
         }
@@ -113,7 +113,7 @@ public class SQLiteConnectionManager {
                 return true;
 
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, "Table creation failed.", e);
                 return false;
             }
         }
@@ -135,7 +135,7 @@ public class SQLiteConnectionManager {
             pstmt.setString(2, word);        
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.WARNING, "Failed to add word to database: " + word, e);
         }
     } 
 
@@ -162,7 +162,7 @@ public class SQLiteConnectionManager {
             return false;
     
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.WARNING, "Database error when checking word: " + guess, e);
             return false;
         }
     }

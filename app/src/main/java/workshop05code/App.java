@@ -20,7 +20,7 @@ public class App {
     static {
         // must set before the Logger
         // loads logging.properties from the classpath
-        try {// resources\logging.properties
+        try {
             LogManager.getLogManager().readConfiguration(new FileInputStream("resources/logging.properties"));
         } catch (SecurityException | IOException e1) {
             e1.printStackTrace();
@@ -38,15 +38,19 @@ public class App {
 
         wordleDatabaseConnection.createNewDatabase("words.db");
         if (wordleDatabaseConnection.checkIfConnectionDefined()) {
-            System.out.println("Wordle created and connected.");
+            logger.info("Wordle created and connected.");
+            logger.info("Connected to database.");
         } else {
-            System.out.println("Not able to connect. Sorry!");
+            logger.severe("Not able to connect. Sorry!");
+            logger.severe("Could not connect to database.");
             return;
         }
         if (wordleDatabaseConnection.createWordleTables()) {
-            System.out.println("Wordle structures in place.");
+            logger.info("Wordle structures in place.");
+            logger.info("Tables created successfully.");
         } else {
-            System.out.println("Not able to launch. Sorry!");
+            logger.severe("Not able to launch. Sorry!");
+            logger.severe("Failed to create table structures.");
             return;
         }
 
@@ -57,18 +61,16 @@ public class App {
             int i = 1;
             while ((line = br.readLine()) != null) {
                 if (line.matches("[a-z]{4}")) {
-                    // Valid word
                     wordleDatabaseConnection.addValidWord(i, line);
-                    logger.fine("Added valid word: " + line); // Optional log
+                    logger.fine("Added valid word: " + line);
                     i++;
                 } else {
-                    // Invalid word
                     logger.severe("Invalid word in data.txt (ignored): " + line);
                 }
             }
         } catch (IOException e) {
             System.out.println("Not able to load. Sorry!");
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load data.txt", e);
             return;
         }
 
@@ -95,8 +97,9 @@ public class App {
                 System.out.print("Enter a 4 letter word for a guess or q to quit: ");
                 guess = scanner.nextLine();
             }
+            logger.info("User exited the game."); 
         } catch (NoSuchElementException | IllegalStateException e) {
-            logger.log(Level.SEVERE, "Scanner error", e);
+            logger.log(Level.SEVERE, "Scanner error during user input.", e);
         }
 
     }
